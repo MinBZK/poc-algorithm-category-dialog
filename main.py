@@ -4,6 +4,7 @@ from typing import Annotated
 import uvicorn
 from fastapi import FastAPI, Form
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic_core import from_json
@@ -12,7 +13,19 @@ from starlette.middleware.sessions import SessionMiddleware
 templates = Jinja2Templates(directory="templates")
 
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key="some-random-string")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="some-random-string",
+)
 
 questions = from_json(open("questions.json", "r").read())
 secret_key = "questions"
