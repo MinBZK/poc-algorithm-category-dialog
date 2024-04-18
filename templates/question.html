@@ -1,29 +1,37 @@
 <div hx-target="this" hx-swap="outerHTML">
-    <h2 class="card-title">What's the category of my algorithm?</h2>
+    <h1 class="card-title">What's the category of my algorithm?</h1>
     <div class="overflow-x-auto text-sm">
         <table class="table">
             <tbody>
-            {% for q, a in textqa %}
-            <tr>
+            {% for q, a, l in textqa %}
+            <tr hx-delete="/delete/{{l}}" class="cursor-pointer">
                 <th>{{q}}</th>
                 <td>{{a}}</td>
+                <td>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path d="m2.695 14.762-1.262 3.155a.5.5 0 0 0 .65.65l3.155-1.262a4 4 0 0 0 1.343-.886L17.5 5.501a2.121 2.121 0 0 0-3-3L3.58 13.419a4 4 0 0 0-.885 1.343Z"/>
+                    </svg>
+
+                </td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
     {% if category is defined %}
-    <div class="badge badge-secondary badge-lg">{{category}}</div>
+    <div>The risk category:
+        <div class="badge badge-neutral">{{category}}</div>
+    </div>
     {% else %}
     <form hx-post="/question/{{question.label}}">
         <div>
-            <p>{{question.question}}</p>
+            <b>{{question.question}}</b>
             <div>
                 {% for a in question.answers %}
                 <div class="form-control">
                     <label class="label cursor-pointer">
                         <span class="label-text">{{a.text}}</span>
-                        <input type="radio" name="answer" value="{{a.label}}" class="radio checked:bg-blue-500"/>
+                        <input type="radio" name="answer" value="{{a.label}}" class="radio"/>
                     </label>
                 </div>
                 {% endfor %}
