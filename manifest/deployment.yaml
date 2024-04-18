@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tad-category-dialog
+spec:
+  selector:
+    matchLabels:
+      app: tad-category-dialog
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tad-category-dialog
+    spec:
+      containers:
+        - name: tad-category-dialog
+          image: ghcr.io/minbzk/tad-category-dialog:0.3
+          imagePullPolicy: Always
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
