@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ing
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: tad-category-dialog.apps.digilab.network
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: tad-category-dialog-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - tad-category-dialog.apps.digilab.network
+      secretName: tad-category-dialog-tls
