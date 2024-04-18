@@ -91,5 +91,13 @@ async def index(request: Request):
                                       context=context)
 
 
+@app.get(path="/embedded", response_class=HTMLResponse)
+async def embedded(request: Request):
+    context = await get_question(request)
+    return templates.TemplateResponse(request=request,
+                                      name="question.html",
+                                      context=context)
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
