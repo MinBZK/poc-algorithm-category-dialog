@@ -1,41 +1,33 @@
 {
-  "label": "root",
   "question": "What kind of algorithm do you have?",
   "answers": [
     {
-      "label": "genai",
       "text": "Generative AI",
       "category": "High Risk"
     },
     {
-      "label": "otherai",
       "text": "Other AI",
       "category": "Normal Risk"
     },
     {
-      "label": "rulebased",
       "text": "Not AI (rule based)",
       "question": "Is there human oversight?",
       "answers": [
         {
-          "label": "humanoversight",
           "text": "Yes",
           "question": "Is your algorithm involved in fraud detection?",
           "answers": [
             {
-              "label": "frauddetection",
               "text": "Yes",
               "category": "High Risk"
             },
             {
-              "label": "nofrauddetection",
               "text": "No",
               "category": "Normal Risk"
             }
           ]
         },
         {
-          "label": "nohumanoversight",
           "text": "No",
           "category": "High Risk"
         }
