@@ -51,7 +51,7 @@ async def get_question(request, answer=None, label=None):
             if a.get("label") == prev_answer:
                 q = a
                 break
-        texta = q["text"]
+        texta = q.get("text")
         textqa.append((textq, texta, prev_label))
 
     if "category" in q:
@@ -70,6 +70,7 @@ async def delete(label: str, request: Request):
             del answered[k]
 
     context = await get_question(request)
+    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
     return templates.TemplateResponse(request=request,
                                       name="question.html",
                                       context=context)
@@ -78,6 +79,8 @@ async def delete(label: str, request: Request):
 @app.post(path="/question/{label}", response_class=HTMLResponse)
 async def question(label: str, answer: Annotated[str, Form()], request: Request):
     context = await get_question(request, answer, label)
+    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
+    context[]
     return templates.TemplateResponse(request=request,
                                       name="question.html",
                                       context=context)
@@ -86,6 +89,7 @@ async def question(label: str, answer: Annotated[str, Form()], request: Request)
 @app.get(path="/", response_class=HTMLResponse)
 async def index(request: Request):
     context = await get_question(request)
+    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
     return templates.TemplateResponse(request=request,
                                       name="index.html",
                                       context=context)
@@ -94,8 +98,9 @@ async def index(request: Request):
 @app.get(path="/embedded", response_class=HTMLResponse)
 async def embedded(request: Request):
     context = await get_question(request)
+    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
     return templates.TemplateResponse(request=request,
-                                      name="question.html",
+                                      name="embedded.html",
                                       context=context)
 
 

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TAG="0.10"
+IMAGE_NAME="tad-category-dialog"
+DOCKER_REGISTRY="ghcr.io/minbzk"
+
+docker build -t $IMAGE_NAME:$TAG .
+docker tag $IMAGE_NAME:$TAG $DOCKER_REGISTRY/$IMAGE_NAME:$TAG
+docker push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG
