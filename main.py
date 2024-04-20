@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Annotated
 
 import uvicorn
@@ -8,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic_core import from_json
-from starlette.middleware.sessions import SessionMiddleware
 
 templates = Jinja2Templates(directory="templates")
 
@@ -22,74 +20,58 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(
-    SessionMiddleware,
-    secret_key="some-random-string",
-)
-
-questions = from_json(open("questions.json", "r").read())
-secret_key = "questions"
+QUESTIONS = from_json(open("questions.json", "r").read())
 
 
-async def get_answered(request):
-    answered = request.session.get(secret_key)
-    if not answered:
-        answered = request.session[secret_key] = OrderedDict()
-    return answered
+async def get_context(request, path=""):
+    q = QUESTIONS
+    answered = []
+    parts = path.split(".") if path else []
+    for i, p in enumerate(parts):
+        if "answers" in q:
+            textq = q["question"]
+            q = q["answers"][int(p)]
+            texta = q.get("text")
+            answered.append((".".join(parts[:i]), textq, texta))
 
-
-async def get_question(request, answer=None, label=None):
-    answered = await get_answered(request)
-    if label and answer:
-        answered[label] = answer
-
-    q = questions
-    textqa = []
-    for prev_label, prev_answer in answered.items():
-        textq = q["question"]
-        for a in q.get("answers"):
-            if a.get("label") == prev_answer:
-                q = a
-                break
-        texta = q.get("text")
-        textqa.append((textq, texta, prev_label))
+    context = {"answered": answered,
+               "host": str(request.base_url).rstrip("/")}  # .replace("http://", "https://")
 
     if "category" in q:
-        return {"category": q["category"], "textqa": textqa}
-    return {"question": q, "textqa": textqa}
+        return {"category": q["category"], **context}
+
+    answers = [(".".join(parts + [str(i)]), a.get("text")) for i, a in enumerate(q.get("answers"))]
+
+    return {"question": q["question"], "answers": answers, **context}
 
 
-@app.delete(path="/delete/{label}", response_class=HTMLResponse)
-async def delete(label: str, request: Request):
-    answered = await get_answered(request)
-    delete_next = False
-    for k in list(answered.keys()):
-        if k == label:
-            delete_next = True
-        if delete_next:
-            del answered[k]
-
-    context = await get_question(request)
-    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
+@app.delete(path="/delete/{path}", response_class=HTMLResponse)
+async def delete(path: str, request: Request):
+    context = await get_context(request, path)
     return templates.TemplateResponse(request=request,
-                                      name="question.html",
+                                      name="card.html",
                                       context=context)
 
 
-@app.post(path="/question/{label}", response_class=HTMLResponse)
-async def question(label: str, answer: Annotated[str, Form()], request: Request):
-    context = await get_question(request, answer, label)
-    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
-    context[]
+@app.delete(path="/delete", response_class=HTMLResponse)
+async def delete(request: Request):
+    context = await get_context(request)
     return templates.TemplateResponse(request=request,
-                                      name="question.html",
+                                      name="card.html",
+                                      context=context)
+
+
+@app.post(path="/answer", response_class=HTMLResponse)
+async def answer(path: Annotated[str, Form()], request: Request):
+    context = await get_context(request, path)
+    return templates.TemplateResponse(request=request,
+                                      name="card.html",
                                       context=context)
 
 
 @app.get(path="/", response_class=HTMLResponse)
 async def index(request: Request):
-    context = await get_question(request)
-    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
+    context = await get_context(request)
     return templates.TemplateResponse(request=request,
                                       name="index.html",
                                       context=context)
@@ -97,8 +79,7 @@ async def index(request: Request):
 
 @app.get(path="/embedded", response_class=HTMLResponse)
 async def embedded(request: Request):
-    context = await get_question(request)
-    context["host"] = str(request.base_url).rstrip("/").replace("http://", "https://")
+    context = await get_context(request)
     return templates.TemplateResponse(request=request,
                                       name="embedded.html",
                                       context=context)

@@ -5,7 +5,7 @@
             <div class="overflow-x-auto text-sm">
                 <table class="table">
                     <tbody>
-                    {% for q, a, l in textqa %}
+                    {% for l, q, a in answered %}
                     <tr hx-delete="{{host}}/delete/{{l}}" class="cursor-pointer">
                         <th>{{q}}</th>
                         <td>{{a}}</td>
@@ -25,15 +25,15 @@
                 <div class="badge badge-neutral">{{category}}</div>
             </div>
             {% else %}
-            <form hx-post="{{host}}/question/{{question.label}}">
+            <form hx-post="{{host}}/answer">
                 <div>
-                    <b>{{question.question}}</b>
+                    <b>{{question}}</b>
                     <div>
-                        {% for a in question.answers %}
+                        {% for label, a in answers %}
                         <div class="form-control">
                             <label class="label cursor-pointer">
-                                <span class="label-text">{{a.text}}</span>
-                                <input type="radio" name="answer" value="{{a.label}}" class="radio"/>
+                                <span class="label-text">{{a}}</span>
+                                <input type="radio" name="path" value="{{label}}" class="radio"/>
                             </label>
                         </div>
                         {% endfor %}
