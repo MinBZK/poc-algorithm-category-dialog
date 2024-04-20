@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG="0.10"
+TAG="0.13"
 IMAGE_NAME="tad-category-dialog"
 DOCKER_REGISTRY="ghcr.io/minbzk"
 

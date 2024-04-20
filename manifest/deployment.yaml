@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tad-category-dialog
-          image: ghcr.io/minbzk/tad-category-dialog:0.10
+          image: ghcr.io/minbzk/tad-category-dialog:0.13
           imagePullPolicy: Always
       restartPolicy: Always
       imagePullSecrets:

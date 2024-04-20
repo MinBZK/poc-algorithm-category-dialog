@@ -34,8 +34,10 @@ async def get_context(request, path=""):
             texta = q.get("text")
             answered.append((".".join(parts[:i]), textq, texta))
 
-    context = {"answered": answered,
-               "host": str(request.base_url).rstrip("/")}  # .replace("http://", "https://")
+    context = {
+        "answered": answered,
+        "host": str(request.base_url).rstrip("/").replace("http://", "https://")
+    }
 
     if "category" in q:
         return {"category": q["category"], **context}
@@ -53,7 +55,7 @@ async def delete(path: str, request: Request):
                                       context=context)
 
 
-@app.delete(path="/delete", response_class=HTMLResponse)
+@app.delete(path="/delete/", response_class=HTMLResponse)
 async def delete(request: Request):
     context = await get_context(request)
     return templates.TemplateResponse(request=request,
